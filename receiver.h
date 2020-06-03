@@ -1,14 +1,13 @@
-FILE *fileNameRec(int connfd, char filename[]);
-void writefile(int sockfd, FILE *fp,char filename[],char client[], ssize_t totalRec);
+// FILE *fileNameRec(int connfd, char filename[]);
+void writefile(int sockfd, char client[]);
 
-int receive(char receiver_ip[]) 
+int bindSocket(char receiver_ip[]) 
 {
-    ssize_t totalRec=0;
+    // ssize_t totalRec=0;
 	// WSADATA wsaData;
 	int sockfd ,c;
     struct sockaddr_in clientaddr, serveraddr;
-    char filename[BUFFSIZE] = {0}; 
-    FILE *fp;
+    // FILE *fp;
     //Init WinSock
     sockfd  = iniSocket();
     
@@ -49,26 +48,33 @@ int receive(char receiver_ip[])
 
     printf("\n Waiting For sender..............");
     printf("\n Connection Accepted from Host : %s" ,inet_ntoa(clientaddr.sin_addr));
-
-
-    fp = fileNameRec(connfd,filename);
-    printf("\n File name Received : %s" ,filename);
-
-    printf("\n  I am Started Receiving file: %s from %s\n ", filename,inet_ntoa(clientaddr.sin_addr) );
-    writefile(connfd, fp , filename, inet_ntoa(clientaddr.sin_addr),totalRec);
     
+    writefile(connfd, inet_ntoa(clientaddr.sin_addr));
 
-    fclose(fp);
     close(connfd);
     // WSACleanup();
     // getch();
     return 0;
 }
 
-FILE *fileNameRec(int connfd, char filename[])
+// FILE *fileNameRec(int connfd, char filename[])
+// {
+     
+
+//     return fp;
+// }
+
+
+
+void writefile(int sockfd ,char client[])
 {
-     FILE *fp;
-    if (recv(connfd, filename, BUFFSIZE, 0) == -1) 
+    ssize_t n;
+    char buff[MAX_LINE] = {0};
+    char filename[BUFFSIZE] = {0}; 
+    ssize_t totalRec =0;
+
+    FILE *fp;
+    if (recv(sockfd, filename, BUFFSIZE, 0) == -1) 
     {
         perror("\n Can't receive filename");
         WSACleanup();
@@ -84,18 +90,14 @@ FILE *fileNameRec(int connfd, char filename[])
         exit(1);
     }
 
-    return fp;
-}
+    printf("\n File name Received : %s" ,filename);
 
 
+    printf("\n  I am Started Receiving file: %s from %s\n ", filename,client );
 
-void writefile(int sockfd, FILE *fp , char filename[], char client[] ,ssize_t totalRec)
-{
-    ssize_t n;
-    char buff[MAX_LINE] = {0};
     while ((n = recv(sockfd, buff, MAX_LINE, 0)) > 0) 
     {
-        printf("\n Receiving  %d bytes file: %s from %s- -------\n ",totalRec, filename,client );
+        printf("\n Receiving  %ld bytes file: %s from %s- -------\n ",totalRec, filename,client );
 
 	    totalRec+=n;
         if (n == -1)
@@ -113,6 +115,7 @@ void writefile(int sockfd, FILE *fp , char filename[], char client[] ,ssize_t to
         memset(buff, 0, MAX_LINE);
     }
 
+    fclose(fp);
     printf("\n Receive Success, NumBytes = %ld\n ", totalRec);
     printf("\n File Received Successfully and Stored as: %s \n", filename);
 

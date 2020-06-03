@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
 					// printf("%s ",ipAddress);
 					
 		// Call Receiver Function here
-					receive(ipAddress);
+					bindSocket(ipAddress);
 					WSACleanup();
 					break;
 		case 2:
@@ -61,7 +61,7 @@ int main(int argc, char *argv[]) {
 	
 //				printf("%s  %s ",ipAddress,basename(path));
 //			Call Sender function here			
-					sender(ipAddress,path);		
+					validateInput(ipAddress,path);		
 					WSACleanup();
 					break;
 		case 3:		WSACleanup();

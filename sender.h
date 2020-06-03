@@ -1,14 +1,16 @@
-void sendFileName(char path[], int sockfd);
+void sendFileName(char path[], int sockfd );
 
-void sendfile(char path[], int sockfd , ssize_t total);
+void sendfile(char path[], int sockfd );
 
-int sender(char receiver_ip[], char path[])
+int validateInput(char receiver_ip[], char path[]);
+
+int socketConnect(char receiver_ip[], char path[])
 {
    
    
    	// WSADATA wsaData;
 	int sockfd;
-    ssize_t total=0;
+   
 
     sockfd  = iniSocket();
 
@@ -30,7 +32,7 @@ int sender(char receiver_ip[], char path[])
     
     sendFileName(path,sockfd);
 
-    sendfile(path, sockfd ,total);
+    
     //puts("Send Success");
     
     close(sockfd);
@@ -65,17 +67,43 @@ void sendFileName(char path[], int sockfd)
     
     printf("\n File Name Sent ............");
     
-
-
-
-
+    sendfile(path, sockfd );
+    
+    
+    
 }
 
+int validateInput(char receiver_ip[], char path[])
+{
+	if(strlen(receiver_ip)<7 || strlen(receiver_ip)>15)
+	{
+		perror("Invalid IP ");
+		WSACleanup();
+        getch();
+        exit(1);
+	}
+	
+	if(strlen(path) <=1)
+	{
+		perror("Invalid Path ");
+		WSACleanup();
+        getch();
+        exit(1);
+		
+	}
+	
+	socketConnect(receiver_ip, path);
+	
+	return 0;
+	
+	
+}
 
-void sendfile(char path[], int sockfd ,ssize_t total) 
+void sendfile(char path[], int sockfd ) 
 {
     int n; 
     char sendline[MAX_LINE] = {0};
+     ssize_t total=0;
 
     
     FILE *fp = fopen(path, "rb");
